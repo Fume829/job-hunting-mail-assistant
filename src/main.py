@@ -1,9 +1,13 @@
 from discord_notifier import send_discord_notification
 from gmail_client import get_unread_emails
 from openai_client import analyze_email
+from database import initialize_database, save_company
 
 
 def main():
+
+    initialize_database()
+
     try:
         emails = get_unread_emails(max_results=5)
 
@@ -24,13 +28,17 @@ def main():
                 email_body,
             )
 
-            results.append(
-                {
-                    "subject": email["subject"],
-                    "sender": email["sender"],
-                    **analysis,
-                }
-            )
+            result = {
+                "subject": email["subject"],
+                "sender": email["sender"],
+                **analysis,
+            }
+
+            results.append(result)
+
+            if result["category"] != "その他":
+                save_company(result)
+            
 
         results.sort(
             key=lambda item: int(item["priority"]),

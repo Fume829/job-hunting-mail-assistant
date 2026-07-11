@@ -2,6 +2,7 @@ import streamlit as st
 
 from gmail_client import get_unread_emails
 from openai_client import analyze_email
+from database import get_companies
 
 
 st.set_page_config(

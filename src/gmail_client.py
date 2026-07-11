@@ -7,7 +7,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/calendar.events",
+]
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CREDENTIALS_PATH = os.path.join(
@@ -18,8 +21,8 @@ CREDENTIALS_PATH = os.path.join(
 TOKEN_PATH = os.path.join(BASE_DIR, "token.json")
 
 
-def authenticate_gmail():
-    """Gmail APIの認証を行う。"""
+def get_credentials():
+    """Google APIの認証情報を取得する。"""
 
     credentials = None
 
@@ -42,7 +45,19 @@ def authenticate_gmail():
         with open(TOKEN_PATH, "w", encoding="utf-8") as token_file:
             token_file.write(credentials.to_json())
 
-    return build("gmail", "v1", credentials=credentials)
+    return credentials
+
+
+def authenticate_gmail():
+    """Gmail APIのサービスを作成する。"""
+
+    credentials = get_credentials()
+
+    return build(
+        "gmail",
+        "v1",
+        credentials=credentials,
+    )
 
 
 def get_header(headers, name):
