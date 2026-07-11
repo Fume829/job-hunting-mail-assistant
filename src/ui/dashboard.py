@@ -1,8 +1,8 @@
 import streamlit as st
 
-from gmail_client import get_unread_emails
-from openai_client import analyze_email
-from database import get_companies
+from src.clients.gmail_client import get_unread_emails
+from src.clients.openai_client import analyze_email
+from src.data.database import get_companies
 
 
 st.set_page_config(

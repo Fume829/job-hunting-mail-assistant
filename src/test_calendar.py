@@ -1,4 +1,4 @@
-from calendar_client import create_deadline_event
+from src.clients.calendar_client import create_deadline_event
 
 
 event = create_deadline_event(

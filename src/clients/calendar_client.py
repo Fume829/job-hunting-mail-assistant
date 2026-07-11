@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from googleapiclient.discovery import build
 
-from gmail_client import get_credentials
+from src.clients.gmail_client import get_credentials
 
 
 def get_calendar_service():

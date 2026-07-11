@@ -1,4 +1,4 @@
-from discord_notifier import send_discord_notification
+from src.clients.discord_notifier import send_discord_notification
 
 
 sample_results = [

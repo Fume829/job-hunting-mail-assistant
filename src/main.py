@@ -1,7 +1,7 @@
-from discord_notifier import send_discord_notification
-from gmail_client import get_unread_emails
-from openai_client import analyze_email
-from database import initialize_database, save_company
+from src.clients.discord_notifier import send_discord_notification
+from src.clients.gmail_client import get_unread_emails
+from src.clients.openai_client import analyze_email
+from src.data.database import initialize_database, save_company
 
 
 def main():
