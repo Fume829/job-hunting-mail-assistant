@@ -1,2 +1,33 @@
-# job-hunting-mail-assistant
-Gmailに届く就活関連メールを自動分類・整理するPythonアプリ
+# JobPilot AI 🤖
+
+AIが就職活動をサポートするメールアシスタントです。
+
+## 概要
+
+JobPilot AIは、Gmailに届く就活関連メールをAIが解析し、
+企業名・メールの種類・要約・やるべきこと・締切・優先度を自動で整理するアプリです。
+
+## 主な機能
+
+- Gmailから未読メールを取得
+- AIによるメール解析
+- 企業名の抽出
+- メール分類
+- メール内容の要約
+- やるべきことの抽出
+- 締切の抽出
+- 優先度判定
+
+## 今後追加予定
+
+- Streamlitダッシュボード
+- Discord通知
+- Googleカレンダー連携
+- 応募企業管理
+
+## 使用技術
+
+- Python
+- OpenAI API
+- Gmail API
+- GitHub
