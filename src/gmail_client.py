@@ -1,3 +1,4 @@
+import base64
 import os
 
 from google.auth.transport.requests import Request
@@ -54,8 +55,48 @@ def get_header(headers, name):
     return ""
 
 
+def decode_body(data):
+    """Base64形式の本文を文字列へ変換する。"""
+
+    if not data:
+        return ""
+
+    decoded = base64.urlsafe_b64decode(data)
+    return decoded.decode("utf-8", errors="replace")
+
+
+def extract_body(payload):
+    """Gmail APIのpayloadから本文を取得する。"""
+
+    mime_type = payload.get("mimeType", "")
+    body_data = payload.get("body", {}).get("data")
+
+    if mime_type == "text/plain" and body_data:
+        return decode_body(body_data)
+
+    parts = payload.get("parts", [])
+
+    for part in parts:
+        if part.get("mimeType") == "text/plain":
+            data = part.get("body", {}).get("data")
+
+            if data:
+                return decode_body(data)
+
+    for part in parts:
+        body = extract_body(part)
+
+        if body:
+            return body
+
+    if body_data:
+        return decode_body(body_data)
+
+    return ""
+
+
 def get_unread_emails(max_results=10):
-    """未読メールの件名、送信者、本文の一部を取得する。"""
+    """未読メールの件名、送信者、本文全文を取得する。"""
 
     service = authenticate_gmail()
 
@@ -80,19 +121,21 @@ def get_unread_emails(max_results=10):
             .get(
                 userId="me",
                 id=message["id"],
-                format="metadata",
-                metadataHeaders=["Subject", "From"],
+                format="full",
             )
             .execute()
         )
 
-        headers = message_data["payload"].get("headers", [])
+        payload = message_data.get("payload", {})
+        headers = payload.get("headers", [])
+        body = extract_body(payload)
 
         emails.append(
             {
                 "id": message["id"],
                 "subject": get_header(headers, "Subject"),
                 "sender": get_header(headers, "From"),
+                "body": body,
                 "snippet": message_data.get("snippet", ""),
             }
         )

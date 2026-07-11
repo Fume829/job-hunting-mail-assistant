@@ -1,27 +1,36 @@
-from classifier import classify_email
 from gmail_client import get_unread_emails
+from openai_client import analyze_email
 
 
 def main():
     try:
-        emails = get_unread_emails(max_results=10)
+        emails = get_unread_emails(max_results=3)
 
         if not emails:
             print("未読メールはありません。")
             return
 
         for index, email in enumerate(emails, start=1):
-            category = classify_email(
+            print(f"\n{index}件目をAIで解析しています...")
+
+            email_body = email["body"]
+
+            if not email_body:
+                email_body = email["snippet"]
+
+            result = analyze_email(
                 email["subject"],
                 email["sender"],
-                email["snippet"],
+                email_body,
             )
 
             print("=" * 60)
-            print(f"{index}. [{category}]")
-            print(f"件名: {email['subject']}")
-            print(f"送信者: {email['sender']}")
-            print(f"本文: {email['snippet']}")
+            print(f"企業・サービス: {result['company']}")
+            print(f"分類: {result['category']}")
+            print(f"要約: {result['summary']}")
+            print(f"やること: {result['todo']}")
+            print(f"締切: {result['deadline']}")
+            print(f"優先度: {'★' * result['priority']}")
 
     except FileNotFoundError:
         print("credentials/credentials.jsonが見つかりません。")
