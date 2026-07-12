@@ -9,7 +9,14 @@ def main():
     initialize_database()
 
     try:
-        emails = get_unread_emails(max_results=5)
+        emails = get_unread_emails(
+            max_results=10,
+            query=(
+                'is:unread '
+                '(インターン OR 選考 OR 面接 OR 説明会 OR オファー '
+                'OR エントリー OR 応募 OR 就活)'
+            ),
+        )
 
         if not emails:
             print("未読メールはありません。")
@@ -33,6 +40,11 @@ def main():
                 "sender": email["sender"],
                 **analysis,
             }
+
+            print(
+                f"解析結果: {result['company']} / "
+                f"{result['category']} / 優先度{result['priority']}"
+            )
 
             results.append(result)
 

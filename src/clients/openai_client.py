@@ -64,3 +64,48 @@ def analyze_email(subject, sender, snippet):
         result_text = result_text.strip()
 
     return json.loads(result_text)
+
+def answer_job_question(question, companies):
+    """SQLiteに保存された就活情報を参照して質問に回答する。"""
+
+    if not companies:
+        return "保存されている就活情報がありません。先にメールを取得・解析してください。"
+
+    company_data = json.dumps(
+        companies,
+        ensure_ascii=False,
+        indent=2,
+        default=str,
+    )
+
+    prompt = f"""
+あなたは就職活動を支援するAIアシスタント「JobPilot AI」です。
+
+以下はSQLiteデータベースに保存されている就活情報です。
+この情報だけを根拠として、ユーザーの質問に日本語で回答してください。
+
+【就活情報】
+{company_data}
+
+【ユーザーの質問】
+{question}
+
+【回答ルール】
+- 保存されている情報を分かりやすく整理して回答する
+- 締切、Todo、優先度、応募状況を重視する
+- 複数の情報がある場合は、箇条書きを使用する
+- データに存在しない内容は推測しない
+- 情報が見つからない場合は、その旨を明確に伝える
+- 締切が「未記載」の場合は、締切不明と伝える
+"""
+
+    try:
+        response = client.responses.create(
+            model="gpt-5-mini",
+            input=prompt,
+        )
+
+        return response.output_text.strip()
+
+    except Exception as error:
+        return f"AIによる回答の生成中にエラーが発生しました: {error}"

@@ -1,7 +1,7 @@
 import streamlit as st
 
 from src.clients.gmail_client import get_unread_emails
-from src.clients.openai_client import analyze_email
+from src.clients.openai_client import analyze_email, answer_job_question
 from src.data.database import get_companies
 
 
@@ -121,3 +121,57 @@ if st.button("未読メールを解析する", type="primary"):
 
         except Exception as error:
             st.error(f"エラーが発生しました: {error}")
+
+
+st.divider()
+st.subheader("💬 就活AIチャット")
+st.caption("SQLiteに保存された就活情報について質問できます。")
+
+if "chat_messages" not in st.session_state:
+    st.session_state.chat_messages = [
+        {
+            "role": "assistant",
+            "content": (
+                "就活情報について質問してください。"
+                "例えば「優先度が高い情報を教えて」"
+                "「今やるべきことは？」などに回答できます。"
+            ),
+        }
+    ]
+
+for message in st.session_state.chat_messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+question = st.chat_input(
+    "就活情報について質問してください"
+)
+
+if question:
+    st.session_state.chat_messages.append(
+        {
+            "role": "user",
+            "content": question,
+        }
+    )
+
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    companies = get_companies()
+
+    with st.chat_message("assistant"):
+        with st.spinner("就活情報を確認しています..."):
+            answer = answer_job_question(
+                question,
+                companies,
+            )
+
+        st.markdown(answer)
+
+    st.session_state.chat_messages.append(
+        {
+            "role": "assistant",
+            "content": answer,
+        }
+    )

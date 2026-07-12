@@ -114,7 +114,7 @@ def extract_body(payload):
     return ""
 
 
-def get_unread_emails(max_results=10):
+def get_unread_emails(max_results=10, query="is:unread"):
     """未読メールの件名、送信者、本文全文を取得する。"""
 
     service = authenticate_gmail()
@@ -124,7 +124,7 @@ def get_unread_emails(max_results=10):
         .messages()
         .list(
             userId="me",
-            q="is:unread",
+            q=query,
             maxResults=max_results,
         )
         .execute()
