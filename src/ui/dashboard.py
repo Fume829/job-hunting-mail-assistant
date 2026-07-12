@@ -1,7 +1,11 @@
 import streamlit as st
 
 from src.clients.gmail_client import get_unread_emails
-from src.clients.openai_client import analyze_email, answer_job_question
+from src.clients.openai_client import (
+    analyze_email,
+    answer_job_question,
+    generate_daily_todo,
+)
 from src.data.database import get_companies, update_company_status
 
 STATUS_OPTIONS = [
@@ -176,6 +180,23 @@ else:
 
                     st.success("応募状況を更新しました。")
                     st.rerun()
+
+
+st.divider()
+st.subheader("✅ 今日のAI ToDo")
+st.caption("保存済みの就活情報から、今日やるべきことをAIが整理します。")
+
+if st.button("今日やることを作成する"):
+    companies = get_companies()
+
+    with st.spinner("今日のTodoを作成しています..."):
+        todo_text = generate_daily_todo(companies)
+
+    st.session_state["daily_todo"] = todo_text
+
+if "daily_todo" in st.session_state:
+    with st.container(border=True):
+        st.markdown(st.session_state["daily_todo"])
 
 
 st.divider()

@@ -109,3 +109,57 @@ def answer_job_question(question, companies):
 
     except Exception as error:
         return f"AIによる回答の生成中にエラーが発生しました: {error}"
+    
+
+def generate_daily_todo(companies):
+    """保存済みの就活情報から、今日取り組むTodoを生成する。"""
+
+    if not companies:
+        return "保存されている就活情報がありません。"
+
+    company_data = json.dumps(
+        companies,
+        ensure_ascii=False,
+        indent=2,
+        default=str,
+    )
+
+    prompt = f"""
+あなたは就職活動を支援するAIアシスタント「JobPilot AI」です。
+
+以下のSQLiteデータベースに保存された就活情報を確認し、
+ユーザーが今日取り組むべきことを優先順に整理してください。
+
+【就活情報】
+{company_data}
+
+【作成ルール】
+- 今日取り組むべき内容を最大5件に絞る
+- 優先度が高いものを先にする
+- 締切が近いものを優先する
+- 応募状況が「未対応」または「応募検討」のものを重視する
+- 「内定」または「辞退」の企業は原則として除外する
+- 実際に行動できる具体的なTodoとして書く
+- データにない情報は推測しない
+- 各項目に企業名、やること、理由を含める
+- 日本語で簡潔に回答する
+
+次の形式で回答してください。
+
+## 今日のAI ToDo
+
+1. 企業名
+   - やること：
+   - 理由：
+"""
+
+    try:
+        response = client.responses.create(
+            model="gpt-5-mini",
+            input=prompt,
+        )
+
+        return response.output_text.strip()
+
+    except Exception as error:
+        return f"AI ToDoの生成中にエラーが発生しました: {error}"
