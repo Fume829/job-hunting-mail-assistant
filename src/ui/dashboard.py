@@ -2,8 +2,19 @@ import streamlit as st
 
 from src.clients.gmail_client import get_unread_emails
 from src.clients.openai_client import analyze_email, answer_job_question
-from src.data.database import get_companies
+from src.data.database import get_companies, update_company_status
 
+STATUS_OPTIONS = [
+    "未対応",
+    "応募検討",
+    "応募済",
+    "ES提出",
+    "面接予定",
+    "面接済",
+    "最終面接",
+    "内定",
+    "辞退",
+]
 
 st.set_page_config(
     page_title="JobPilot AI",
@@ -121,6 +132,50 @@ if st.button("未読メールを解析する", type="primary"):
 
         except Exception as error:
             st.error(f"エラーが発生しました: {error}")
+
+
+st.divider()
+st.subheader("📊 応募状況管理")
+
+companies = get_companies()
+
+if not companies:
+    st.info("保存されている就活情報がありません。")
+else:
+    for company in companies:
+        with st.container(border=True):
+            left, right = st.columns([3, 1])
+
+            with left:
+                st.subheader(company["company"])
+                st.caption(company["subject"])
+                st.write(f"**分類:** {company['category']}")
+                st.write(f"**やること:** {company['todo']}")
+                st.write(f"**締切:** {company['deadline']}")
+
+            with right:
+                current_status = company["status"]
+
+                if current_status in STATUS_OPTIONS:
+                    current_index = STATUS_OPTIONS.index(current_status)
+                else:
+                    current_index = 0
+
+                selected_status = st.selectbox(
+                    "応募状況",
+                    STATUS_OPTIONS,
+                    index=current_index,
+                    key=f"status_{company['id']}",
+                )
+
+                if selected_status != current_status:
+                    update_company_status(
+                        company["id"],
+                        selected_status,
+                    )
+
+                    st.success("応募状況を更新しました。")
+                    st.rerun()
 
 
 st.divider()
