@@ -101,3 +101,17 @@ src/
 ├─ main.py
 ├─ test_calendar.py
 └─ test_discord.py
+
+## 画面イメージ
+
+### 応募状況管理
+
+企業ごとの応募状況、Todo、締切を一覧で確認できます。
+
+![応募状況管理画面](images/dashboard.png)
+
+### AI ToDo・AIチャット
+
+保存された就活情報をもとに、今日やるべきことの生成や質問への回答ができます。
+
+![AI ToDo・AIチャット画面](images/ai_todo-chat.png)
